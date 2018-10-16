@@ -15,4 +15,4 @@ def request(method, arguments):
     return xml
 
 def requestActualDepartureTimes(station):
-    return request('avt', {'station': station})
+    return request('avt', {'station': station})canv
