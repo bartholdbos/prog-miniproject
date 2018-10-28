@@ -16,11 +16,17 @@ def data(stationName):
     dataXML = getStationInfo(stationName)
     data = ''
     for vertrek in dataXML['ActueleVertrekTijden']['VertrekkendeTrein'][:5]:
+        print(vertrek)
         eindbestemming = vertrek['EindBestemming']
-
         vertrektijd = vertrek['VertrekTijd']  # 2016-09-27T18:36:00+0200
         vertrektijd = vertrektijd[11:16]  # 18:36
+        spoor = vertrek['VertrekSpoor']
 
-        data += 'Om ' + vertrektijd + ' vertrekt een trein naar ' + eindbestemming + '\n'
+        try:
+            spoor = vertrek['VertrekSpoor']['#text']
+        except:
+            spoor = 'Spoor niet beschikbaar'
+
+        data += 'Om ' + vertrektijd + ' vertrekt een trein naar ' + eindbestemming  +  ' op spoor: ' +  spoor + '\n' + '\n'
 
     return data

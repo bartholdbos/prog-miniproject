@@ -3,7 +3,7 @@ import requests
 import xmltodict
 
 api_url = 'http://webservices.ns.nl/'
-auth_details = ('', '')
+auth_details = ('furkanyavuz1998@gmail.com', 'ZjOQF3jXLtg3FPIXKvbsUq3UdIELIDHEFuzsPHheTq6PS6Q7pEhhWA')
 
 def request(method, arguments):
     parameters = urllib.parse.urlencode(arguments)
