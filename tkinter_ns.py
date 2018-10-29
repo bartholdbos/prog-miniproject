@@ -1,6 +1,7 @@
 from tkinter import *
 from infoFunctions import *
 from tkinter import messagebox
+import sys
 
 
 def init():
@@ -30,6 +31,7 @@ class container():
 
         self.showInfoWindow.infoFrame.pack_forget()
         self.inputStationWindow.inputStationFrame.pack(fill="none", expand=TRUE, ipadx=100, ipady=100)
+        self.inputStationWindow.inputField.delete(0, 'end')
 
     def viewInfoFrame(self):
 
@@ -43,16 +45,25 @@ class container():
             station = self.inputStationWindow.inputField.get()
             if station == '':
                 messagebox.showerror("Invoerveld leeg", "Gelieve iets in te voeren")
-        print(data(station))
-        self.showInfoWindow.infoLabel["text"] = 'Huidig station: '+station + '\n'
-        self.showInfoWindow.infoLabel["text"] += data(station)
 
-        self.viewInfoFrame()
+        station_info = data(station)
+
+
+
+        self.showInfoWindow.infoLabel["text"] = 'Huidig station: '+station + ', de eerste 8 worden getoond' +'\n'
+        self.showInfoWindow.infoLabel["text"] += '\n' + station_info
+
+
+
+        if not station_info:
+            self.viewInputStationFrame()
+        else:
+            self.viewInfoFrame()
 def showbutton():
     messagebox.showerror("Error", "Kaartverkoop is hier niet aanwezig")
 
 def infobutton():
-    messagebox.showerror("Informatie", "vertrektijden station: zodra u uw gewenste station succesvol invuld in het invoerveld kunt u op dit knop klikken. Zodra u er op klikt kunt u de 5 vertekkende treinen op het station zien. \n"
+    messagebox.showerror("Informatie", "Vertrektijden station: zodra u uw gewenste station succesvol invuld in het invoerveld kunt u op dit knop klikken. Zodra u er op klikt kunt u de 5 vertekkende treinen op het station zien. \n"
                                        "\nHuidig station: Zodra u hier op klikt zult u alle 5 vertrekkende treinen van dit station zien. \n" "\nOv-chipkaart opladen: Als u hier op klikt kunt u uw ov-chipkaart opladen.")
 
 
@@ -66,18 +77,24 @@ class inputStationWindow():
         self.title.pack(pady=30)
         self.inputField = Entry(master=self.inputStationFrame,font=(15))
         self.inputField.pack(pady=20, padx=10, ipady=10)
-        self.inputButton = Button(master=self.inputStationFrame, text='vertrektijden station',
+        self.inputButton = Button(master=self.inputStationFrame, text='Vertrektijden station',
                                   command=parent.showinfostation, height=3, bg='#0079d3', fg='white')
+        self.inputButton.config(width = '20')
         self.inputButton.pack(padx=5, pady=0)
 
         self.currentButton = Button(master=self.inputStationFrame, text='     Huidig station     ',
                                   command=lambda : parent.showinfostation(True), height=3, bg='#0079d3', fg='white')
+        self.currentButton.config(width = '20')
+
         self.currentButton.pack(padx=5, pady=10, side=LEFT, expand=YES)
 
-        self.infButton = Button(master=self.inputStationFrame, command=infobutton, text='             Info              ', height=3, bg='#0079d3', fg='white')
+        self.infButton = Button(master=self.inputStationFrame, command=infobutton, text='Info', height=3, bg='#0079d3', fg='white')
+        self.infButton.config(width = '20')
         self.infButton.pack(padx=5, pady=10, side=LEFT, expand=YES)
 
         self.ovButton = Button(master=self.inputStationFrame, command=showbutton, text='Ov-chipkaart opladen', height=3, bg='#0079d3', fg='white')
+        self.ovButton.config(width = '20')
+
         self.ovButton.pack(padx=5, pady=10, side=LEFT, expand=YES)
         img = PhotoImage(file='ns1.png')
         self.inputStationFrame.background_label = Label(image=img, bg='#ffc917')
