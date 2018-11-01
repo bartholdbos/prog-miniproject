@@ -1,16 +1,16 @@
 from tkinter import *
+
+
 from infoFunctions import *
 from tkinter import messagebox
-import sys
+
 
 
 def init():
 
-    root = Tk()
 
-    # root.overrideredirect(True)
-    # root.overrideredirect(False)
-    # root.attributes('-fullscreen', True)
+
+    root = Tk()
 
     root.state('zoomed')
     root.configure(bg='#ffc917')
@@ -30,13 +30,13 @@ class container():
     def viewInputStationFrame(self):
 
         self.showInfoWindow.infoFrame.pack_forget()
-        self.inputStationWindow.inputStationFrame.pack(fill="none", expand=TRUE, ipadx=100, ipady=100)
+        self.inputStationWindow.inputStationFrame.pack(fill=NONE, expand=TRUE, ipadx=100, ipady=100)
         self.inputStationWindow.inputField.delete(0, 'end')
 
     def viewInfoFrame(self):
 
         self.inputStationWindow.inputStationFrame.pack_forget()
-        self.showInfoWindow.infoFrame.pack(fill="none", expand=TRUE, ipadx=100, ipady=100)
+        self.showInfoWindow.infoFrame.pack(fill=BOTH, expand=TRUE, pady=100, padx=100)
 
     def showinfostation(self, currentStation = False):
         if currentStation:
@@ -45,20 +45,40 @@ class container():
             station = self.inputStationWindow.inputField.get()
             if station == '':
                 messagebox.showerror("Invoerveld leeg", "Gelieve iets in te voeren")
-
-        station_info = data(station)
-
-
-
-        self.showInfoWindow.infoLabel["text"] = 'Huidig station: '+station + ', de eerste 8 worden getoond' +'\n'
-        self.showInfoWindow.infoLabel["text"] += '\n' + station_info
+                return False
 
 
 
-        if not station_info:
-            self.viewInputStationFrame()
-        else:
+        db_conn = database()
+
+        if station == 'update_station_list':
+            db_conn.excel_to_db()
+            messagebox.showinfo("update", "Update compleet")
+
+            return False
+
+        valid_station  = db_conn.read_from_db_by_input(station)
+        station_info = ''
+
+        if valid_station:
+            station_info = data(valid_station)
+
+        if station_info:
+            self.showInfoWindow.infoLabel["text"] = 'Huidig station: ' + valid_station +'\n'
+            for station in station_info:
+                self.showInfoWindow.listbox.insert(END, 'Om {} {} vertrekt een {} naar {} op spoor: {}'.format(station[0],station[1],station[2],station[3],station[4]))
+
+                if station[5]:
+                    for halte in station[5].split(','):
+                        self.showInfoWindow.listbox.insert(END, '   · {}'.format(halte))
+
             self.viewInfoFrame()
+        elif station_info == 'conn_error':
+            messagebox.showerror("Error", 'Geen verbinding')
+        else:
+            messagebox.showerror("Error", 'Station bestaat niet!')
+
+
 def showbutton():
     messagebox.showerror("Error", "Kaartverkoop is hier niet aanwezig")
 
@@ -106,11 +126,16 @@ class showInfoWindow():
     def __init__(self, parent, master):
         self.infoFrame = Frame(master=master, bg='#ffc917')
         self.infoFrame.pack(fill="none", expand=TRUE)
-        self.infoLabel = Label(master=self.infoFrame, text='', bg='#ffc917', font=(20), borderwidth=2, relief="groove")
+        self.infoLabel = Label(master=self.infoFrame, text='', bg='#ffc917', font=(20), relief="groove")
         self.infoLabel.pack(ipadx=200, ipady=50)
         self.backbutton = Button(master=self.infoFrame, text='Terug', command=parent.viewInputStationFrame,
                                  height=3, width=10, bg='#0079d3', fg='white')
         self.backbutton.pack(padx=5, pady=10, expand=YES, side=TOP)
+        self.scrollbar = Scrollbar(master=self.infoFrame)
+        self.scrollbar.pack(side=RIGHT, fill=BOTH)
+        self.listbox = Listbox(master=self.infoFrame, yscrollcommand=self.scrollbar.set,height=30)
+        self.listbox.pack(side=TOP,fill=BOTH)
+
 
 
 init()
