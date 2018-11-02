@@ -237,17 +237,26 @@ class database():
         self.executer.close()  # sluit de executer
         self.conn.close()  # sluit de connectie
 
-    def getSingleData(self, sql_command):
+    def getSingleData(self, sql_command, parameter=False):
         """
 
         Args:
             sql_command: de sql command die uitgevoerd moet worden
+            parameter: Als er paramters gebined moet worden voor de sql
 
         Returns:
             return data van database
 
         """
-        self.executer.execute(sql_command)  # voer uit
+
+
+        if parameter:
+            print(sql_command)
+            print(parameter)
+            self.executer.execute(sql_command, [parameter])  # bind met paramter
+        else:
+            self.executer.execute(sql_command)  # voer de sql uit
+
         return self.executer.fetchone()  # return 1 resultaat
 
     def excel_to_db(self):
@@ -274,8 +283,7 @@ class database():
         Returns:
             Return False als er geen match is, of station als er wel een match is
         """
-        data = self.getSingleData(
-            'SELECT * FROM stations WHERE name LIKE "%' + input_station + '%" LIMIT 1')  # verkrijg 1 station dat lijkt op de ingevoerde station
+        data = self.getSingleData("SELECT * FROM stations WHERE name LIKE '%' || (?) || '%' LIMIT 1",input_station)  # verkrijg 1 station dat lijkt op de ingevoerde station
         self.disconnect()  # disconnect database
 
         match = False  # standaard geen overeenkomst
