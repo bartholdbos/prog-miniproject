@@ -1,9 +1,22 @@
-import requests # request voor api
-import xmltodict # xml naar dictonary
-import tkinter.messagebox # import messagebox
+import requests  # request voor api
+import xmltodict  # xml naar dictonary
+import tkinter.messagebox  # import messagebox
+from tkinter import *  # import alles van tkinter
+import classes
 
 
+def init():
+    """
+        Init het scherm met de functies
+    """
+    root = Tk()
 
+    root.state('zoomed')
+    root.configure(bg='#ffc917')
+    mainContainer = classes.container(root)
+    mainContainer.viewInputStationFrame()
+
+    root.mainloop()
 
 def getStationInfo(stationName):
     """
@@ -17,22 +30,21 @@ def getStationInfo(stationName):
         return xml van api .
     """
 
+    auth_details = ('zico.gatsjadoerian@student.hu.nl',
+                    'uOeCNT2uMzIIublGVSi6X2Gcpqg45U3IGmJy56C1lYuLilsl0HLfTQ')  # auth gegevens op teogang te krijgen
+    api_url = 'http://webservices.ns.nl/ns-api-avt?station=' + stationName  # url waar de api kan verbinden
 
-    auth_details = ('zico.gatsjadoerian@student.hu.nl', 'uOeCNT2uMzIIublGVSi6X2Gcpqg45U3IGmJy56C1lYuLilsl0HLfTQ') # auth gegevens op teogang te krijgen
-    api_url = 'http://webservices.ns.nl/ns-api-avt?station=' + stationName # url waar de api kan verbinden
+    try:  # als er geen connectie fout is krijg de response
+        response = requests.get(api_url, auth=auth_details)  # krijg response
+    except requests.ConnectionError:  # asl er wel een connectie fout is
+        return 'conn_error'  # geen verbinding
 
-    try: # als er geen connectie fout is krijg de response
-        response = requests.get(api_url, auth=auth_details) #krijg response
-    except requests.ConnectionError: # asl er wel een connectie fout is
-        return 'conn_error' #geen verbinding
+    vertrekXML = xmltodict.parse(response.text)  # response naar xml parsen
 
-    vertrekXML = xmltodict.parse(response.text) #response naar xml parsen
-
-    if 'error' in vertrekXML: # zit er error in de response display een foutmelding
+    if 'error' in vertrekXML:  # zit er error in de response display een foutmelding
         tkinter.messagebox.showerror("Error", vertrekXML['error']['message'])
 
-
-    return vertrekXML #return xml van api
+    return vertrekXML  # return xml van api
 
 
 def data(stationName):
@@ -87,7 +99,6 @@ def data(stationName):
             data += [[vertrektijd, vertraging, trein_soort, eindbestemming, spoor, route]]  # voeg toe aan list
 
     return data  # return data nested list
-
 
 
 
