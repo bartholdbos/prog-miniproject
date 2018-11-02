@@ -63,7 +63,7 @@ class container():
         db_conn = database()  # database verbinding class
 
         if station == 'update_station_list':  # wordt de commando ingetypt dan update station lijst
-            db_conn.excel_to_db()  # lees excel bestand uit en stop het in de db
+            db_conn.update_station_names()  # lees excel bestand uit en stop het in de db
             tkinter.messagebox.showinfo("update", "Update compleet")  # message complete met uitvoeren
 
             return False  # stop met uitvoeren van deze functie
@@ -73,8 +73,7 @@ class container():
 
         if valid_station:  # is het een geldige station verkrijg informatie
             station_info = functions.data(valid_station)  # verkrijg informatie
-
-        if station_info:  # is het niet False ga door
+        if station_info != 'conn_error' and station_info != False:  # is het niet False ga door
             self.showInfoWindow.infoLabel[
                 "text"] = 'Huidig station: ' + valid_station + '\n'  # Huidige station naam ingevuld door gebruiker
             for station in station_info:  # loop informatie
@@ -99,6 +98,7 @@ class container():
                         self.showInfoWindow.listbox.insert(END, '   · {}'.format(route))
 
             self.viewInfoFrame()  # laat infoscherm zien
+
 
         elif station_info == 'conn_error':  # geen verbinding show error
             tkinter.messagebox.showerror("Error", 'Geen verbinding')  # messagebox geen verbinding
@@ -199,6 +199,7 @@ class showInfoWindow():
         self.scrollbar.pack(side=RIGHT, fill=BOTH)  # plaats het rechter kant
         self.listbox = Listbox(master=self.infoFrame, yscrollcommand=self.scrollbar.set,
                                height=30)  # scrolbare list en bind met scrollbar
+        self.scrollbar.configure(command=self.listbox.yview)
         self.listbox.pack(side=TOP, fill=BOTH)  # plaats het
 
 
@@ -256,7 +257,7 @@ class database():
 
         return self.executer.fetchone()  # return 1 resultaat
 
-    def excel_to_db(self):
+    def update_station_names(self):
         """
         Leeg stations table en lees alles uit de csv bestand en stop dit in de database
         """
@@ -264,12 +265,16 @@ class database():
 
         stations = functions.getStationInfo(None,True) # verkrijg station dict
 
-        for station in stations['stations']['station']: # loop stations
-            if 'NL' == station['country']: # is het nederlands ga door
-                self.execute("INSERT INTO stations (name) VALUES (?)",station['name']) # insert in db
+        if stations == 'conn_error': # geen verbinding
+            tkinter.messagebox.showerror("Error", 'Geen verbinding')  # messagebox geen verbinding
+
+        else:
+            for station in stations['stations']['station']: # loop stations
+                if 'NL' == station['country']: # is het nederlands ga door
+                    self.execute("INSERT INTO stations (name) VALUES (?)",station['name']) # insert in db
 
 
-        self.disconnect()  # disconnect
+            self.disconnect()  # disconnect
 
     def read_from_db_by_input(self, input_station):
         """

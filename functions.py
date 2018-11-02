@@ -67,8 +67,12 @@ def data(stationName):
     dataXML = getStationInfo(stationName)  # roep functie getStationInfo aan om gegevens van de api op te halen
     data = []  # set data leeg
 
-    if dataXML == False:
+    if not dataXML:
         return False  # als stationnaam niet bestaat return False
+
+    if dataXML == 'conn_error':
+        return dataXML
+
 
     if 'error' not in dataXML:
         for vertrek in dataXML['ActueleVertrekTijden']['VertrekkendeTrein']:
