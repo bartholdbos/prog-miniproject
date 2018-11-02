@@ -18,13 +18,14 @@ def init():
 
     root.mainloop()
 
-def getStationInfo(stationName):
+def getStationInfo(stationName,station_list = False):
     """
 
     Haal gegevens op van station met de meegegevende stationsnaam
 
     Args:
         stationName: Station naam om gegevens op te halen
+        station_list: true dan verkrijg station lijst
 
     Returns:
         return xml van api .
@@ -32,7 +33,12 @@ def getStationInfo(stationName):
 
     auth_details = ('zico.gatsjadoerian@student.hu.nl',
                     'uOeCNT2uMzIIublGVSi6X2Gcpqg45U3IGmJy56C1lYuLilsl0HLfTQ')  # auth gegevens op teogang te krijgen
-    api_url = 'http://webservices.ns.nl/ns-api-avt?station=' + stationName  # url waar de api kan verbinden
+
+    if station_list:
+        api_url = 'http://webservices.ns.nl/ns-api-stations' # alle station namen
+    else:
+        api_url = 'http://webservices.ns.nl/ns-api-avt?station=' + stationName  # url waar de api kan verbinden
+
 
     try:  # als er geen connectie fout is krijg de response
         response = requests.get(api_url, auth=auth_details)  # krijg response
